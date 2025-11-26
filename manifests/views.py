@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -6,6 +8,12 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from .models import ManifestEntry
 from .serializers import ManifestEntrySerializer, ManifestSearchSerializer
+
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    """Endpoint pentru obtinerea CSRF token"""
+    return JsonResponse({'detail': 'CSRF cookie set'})
 
 
 class ManifestEntryViewSet(viewsets.ReadOnlyModelViewSet):
