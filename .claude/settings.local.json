@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python manage.py makemigrations:*)",
+      "Bash(py manage.py makemigrations:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
