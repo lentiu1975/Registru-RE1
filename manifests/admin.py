@@ -1,11 +1,14 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.db import models
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import path
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export.fields import Field
 from import_export.widgets import DateWidget
-from .models import ManifestEntry
+from .models import ManifestEntry, DatabaseYear, ContainerType, Ship, Pavilion
 from datetime import datetime
 
 
@@ -84,11 +87,29 @@ class ManifestEntryResource(resources.ModelResource):
                     instance.save(update_fields=['numar_curent'])
 
 
+# Admin actions globale - trebuie definite INAINTE de clase
+def sync_lookup_tables_action(modeladmin, request, queryset):
+    """Actiune admin pentru sincronizarea tabelelor de referinta"""
+    from django.core.management import call_command
+    from io import StringIO
+
+    # Capteaza output-ul command-ului
+    out = StringIO()
+    call_command('sync_lookup_tables', stdout=out)
+    output = out.getvalue()
+
+    # Afiseaza output-ul ca mesaj de succes
+    modeladmin.message_user(request, output)
+
+sync_lookup_tables_action.short_description = 'Sincronizeaza tabele (ContainerType, Ship, Pavilion)'
+
+
 @admin.register(ManifestEntry)
 class ManifestEntryAdmin(ImportExportModelAdmin):
     """Admin pentru ManifestEntry cu import/export Excel"""
 
     resource_class = ManifestEntryResource
+    actions = [sync_lookup_tables_action]
 
     list_display = [
         'format_numar_curent',
@@ -213,6 +234,201 @@ class ManifestEntryAdmin(ImportExportModelAdmin):
 
     date_hierarchy = 'data_inregistrare'
     list_per_page = 50
+
+
+# Admin pentru DatabaseYear
+@admin.register(DatabaseYear)
+class DatabaseYearAdmin(admin.ModelAdmin):
+    """Admin pentru gestionarea bazelor de date pe ani"""
+    list_display = ['year', 'is_active', 'entries_count', 'created_at']
+    list_filter = ['is_active', 'year']
+    search_fields = ['year']
+    actions = ['activate_year']
+
+    def entries_count(self, obj):
+        return obj.entries.count()
+    entries_count.short_description = 'Numar Intrari'
+
+    def activate_year(self, request, queryset):
+        # Dezactiveaza toate
+        DatabaseYear.objects.all().update(is_active=False)
+        # Activeaza selectiile
+        count = queryset.update(is_active=True)
+        self.message_user(request, f'{count} an(i) activat(i) cu succes.')
+    activate_year.short_description = 'Activeaza anul selectat'
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('create-new-year/', self.admin_site.admin_view(self.create_new_year_view), name='create_new_year'),
+        ]
+        return custom_urls + urls
+
+    def create_new_year_view(self, request):
+        """View pentru crearea unui an nou"""
+        if request.method == 'POST':
+            year = request.POST.get('year')
+            try:
+                year = int(year)
+                # Verifica daca exista deja
+                if DatabaseYear.objects.filter(year=year).exists():
+                    messages.error(request, f'Anul {year} exista deja in baza de date.')
+                else:
+                    # Creaza anul nou
+                    new_year = DatabaseYear.objects.create(year=year, is_active=False)
+                    messages.success(request, f'Anul {year} a fost creat cu succes! Poti acum importa date pentru acest an.')
+                return redirect('..')
+            except ValueError:
+                messages.error(request, 'Anul trebuie sa fie un numar valid.')
+                return redirect('..')
+
+        # GET request - afiseaza formular
+        from django.template.response import TemplateResponse
+        context = {
+            **self.admin_site.each_context(request),
+            'title': 'Creare An Nou',
+            'current_year': datetime.now().year,
+            'next_year': datetime.now().year + 1,
+        }
+        return TemplateResponse(request, 'admin/create_new_year.html', context)
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_create_year_button'] = True
+        return super().changelist_view(request, extra_context=extra_context)
+
+
+# Admin pentru Pavilion
+@admin.register(Pavilion)
+class PavilionAdmin(admin.ModelAdmin):
+    """Admin pentru pavilioane"""
+    list_display = ['nume', 'preview_imagine', 'ships_count', 'created_at']
+    search_fields = ['nume']
+    readonly_fields = ['preview_imagine_large', 'created_at', 'updated_at']
+
+    fieldsets = (
+        ('Informatii Pavilion', {
+            'fields': ('nume', 'imagine', 'preview_imagine_large')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def preview_imagine(self, obj):
+        if obj.imagine:
+            return format_html('<img src="{}" width="50" height="30" style="object-fit: contain;" />', obj.imagine.url)
+        return '-'
+    preview_imagine.short_description = 'Preview'
+
+    def preview_imagine_large(self, obj):
+        if obj.imagine:
+            return format_html('<img src="{}" width="200" style="object-fit: contain;" />', obj.imagine.url)
+        return '-'
+    preview_imagine_large.short_description = 'Preview Imagine'
+
+    def ships_count(self, obj):
+        return obj.ships.count()
+    ships_count.short_description = 'Numar Nave'
+
+
+# Admin pentru Ship
+@admin.register(Ship)
+class ShipAdmin(admin.ModelAdmin):
+    """Admin pentru nave"""
+    list_display = ['nume', 'linie_maritima', 'pavilion', 'preview_imagine', 'preview_pavilion', 'entries_count', 'created_at']
+    list_filter = ['linie_maritima', 'pavilion']
+    search_fields = ['nume', 'linie_maritima']
+    readonly_fields = ['preview_imagine_large', 'created_at', 'updated_at']
+    autocomplete_fields = ['pavilion']
+
+    fieldsets = (
+        ('Informatii Nava', {
+            'fields': ('nume', 'linie_maritima', 'pavilion', 'imagine', 'preview_imagine_large', 'descriere')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def preview_imagine(self, obj):
+        if obj.imagine:
+            return format_html('<img src="{}" width="60" height="40" style="object-fit: cover; border-radius: 4px;" />', obj.imagine.url)
+        return '-'
+    preview_imagine.short_description = 'Nava'
+
+    def preview_imagine_large(self, obj):
+        if obj.imagine:
+            return format_html('<img src="{}" width="300" style="object-fit: contain;" />', obj.imagine.url)
+        return '-'
+    preview_imagine_large.short_description = 'Preview Imagine'
+
+    def preview_pavilion(self, obj):
+        if obj.pavilion and obj.pavilion.imagine:
+            return format_html('<img src="{}" width="50" height="30" style="object-fit: contain;" />', obj.pavilion.imagine.url)
+        return '-'
+    preview_pavilion.short_description = 'Pavilion'
+
+    def entries_count(self, obj):
+        return obj.entries.count()
+    entries_count.short_description = 'Intrari'
+
+
+# Admin pentru ContainerType
+@admin.register(ContainerType)
+class ContainerTypeAdmin(admin.ModelAdmin):
+    """Admin pentru tipuri containere cu extragere automata din ManifestEntry"""
+    list_display = ['model_container', 'tip_container', 'preview_imagine', 'entries_count', 'created_at']
+    search_fields = ['model_container', 'tip_container']
+    readonly_fields = ['preview_imagine_large', 'created_at', 'updated_at']
+    actions = ['extract_unique_containers']
+
+    fieldsets = (
+        ('Informatii Container', {
+            'fields': ('model_container', 'tip_container', 'imagine', 'preview_imagine_large', 'descriere')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def preview_imagine(self, obj):
+        if obj.imagine:
+            return format_html('<img src="{}" width="60" height="40" style="object-fit: cover; border-radius: 4px;" />', obj.imagine.url)
+        return '-'
+    preview_imagine.short_description = 'Preview'
+
+    def preview_imagine_large(self, obj):
+        if obj.imagine:
+            return format_html('<img src="{}" width="300" style="object-fit: contain;" />', obj.imagine.url)
+        return '-'
+    preview_imagine_large.short_description = 'Preview Imagine'
+
+    def entries_count(self, obj):
+        return obj.entries.count()
+    entries_count.short_description = 'Intrari'
+
+    def extract_unique_containers(self, request, queryset):
+        """Extrage automat model_container unice din ManifestEntry si le adauga in ContainerType"""
+        unique_containers = ManifestEntry.objects.exclude(model_container='').values('model_container', 'tip_container').distinct()
+
+        created_count = 0
+        for item in unique_containers:
+            model = item['model_container']
+            tip = item['tip_container'] or ''
+            if model:
+                container_type, created = ContainerType.objects.get_or_create(
+                    model_container=model,
+                    defaults={'tip_container': tip}
+                )
+                if created:
+                    created_count += 1
+
+        self.message_user(request, f'{created_count} tipuri de containere noi au fost create automat.')
+    extract_unique_containers.short_description = 'Extrage containere unice din manifeste'
 
 
 # Customizare titluri admin

@@ -41,12 +41,11 @@ export const authAPI = {
     try {
       // Obtine CSRF token
       await api.get('/csrf/');
-      // Login
-      const response = await axios.post(
-        'http://localhost:8000/api-auth/login/',
-        { username, password },
-        { withCredentials: true }
-      );
+      // Login - foloseste endpoint-ul custom JSON
+      const response = await api.post('/login/', {
+        username,
+        password
+      });
       return response;
     } catch (error) {
       throw error;
@@ -55,11 +54,7 @@ export const authAPI = {
 
   logout: async () => {
     try {
-      await axios.post(
-        'http://localhost:8000/api-auth/logout/',
-        {},
-        { withCredentials: true }
-      );
+      await api.post('/logout/');
     } catch (error) {
       throw error;
     }
@@ -67,7 +62,7 @@ export const authAPI = {
 
   checkAuth: async () => {
     try {
-      const response = await api.get('/manifests/');
+      const response = await api.get('/check-auth/');
       return response.status === 200;
     } catch (error) {
       return false;
@@ -85,9 +80,14 @@ export const manifestAPI = {
       if (searchParams.numar_manifest) {
         params.append('numar_manifest', searchParams.numar_manifest);
       }
+      if (searchParams.year) {
+        params.append('year', searchParams.year);
+      }
 
       const response = await api.get(`/manifests/search/?${params.toString()}`);
-      return response.data;
+      // DRF pagination may return {count, next, previous, results}
+      // Extract results array if paginated, otherwise return data as-is
+      return response.data.results || response.data;
     } catch (error) {
       throw error;
     }
@@ -97,6 +97,31 @@ export const manifestAPI = {
     try {
       const response = await api.get(`/manifests/?page=${page}`);
       return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+
+export const yearsAPI = {
+  getAll: async () => {
+    try {
+      const response = await api.get('/years/');
+      // DRF pagination returns {count, next, previous, results}
+      // Extract just the results array
+      return response.data.results || response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getActive: async () => {
+    try {
+      const response = await api.get('/years/');
+      // Handle paginated response
+      const years = response.data.results || response.data;
+      const activeYear = years.find(y => y.is_active);
+      return activeYear || (years.length > 0 ? years[0] : null);
     } catch (error) {
       throw error;
     }

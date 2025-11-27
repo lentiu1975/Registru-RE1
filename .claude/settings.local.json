@@ -4,7 +4,17 @@
       "Bash(python manage.py makemigrations:*)",
       "Bash(py manage.py makemigrations:*)",
       "Bash(git branch:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(py manage.py runserver)",
+      "Bash(npm start)",
+      "Bash(python manage.py runserver:*)",
+      "Bash(timeout 3 echo:*)",
+      "Bash(curl:*)",
+      "Bash(cat:*)",
+      "Bash(py manage.py shell:*)",
+      "Bash(py -m pip:*)",
+      "Bash(findstr:*)",
+      "Bash(py manage.py migrate)"
     ],
     "deny": [],
     "ask": []
