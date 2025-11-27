@@ -1,0 +1,25 @@
+asgiref==3.11.0
+diff-match-patch==20241021
+Django==5.2.8
+django-cors-headers==4.9.0
+django-import-export==4.3.14
+djangorestframework==3.16.1
+et_xmlfile==2.0.0
+numpy==2.3.5
+openpyxl==3.1.5
+pandas==2.3.3
+pillow==12.0.0
+psycopg2-binary==2.9.11
+python-dateutil==2.9.0.post0
+pytz==2025.2
+six==1.17.0
+sqlparse==0.5.3
+tablib==3.9.0
+tzdata==2025.2
+
+# Production dependencies
+gunicorn==23.0.0
+whitenoise==6.8.2
+# mysqlclient==2.2.5  # Necesită compilare - comentat
+PyMySQL==1.1.1  # Pentru MySQL în producție (pure Python, fără compilare)
+python-dotenv==1.0.1  # Pentru variabile de mediu

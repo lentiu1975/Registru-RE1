@@ -14,7 +14,8 @@
       "Bash(py manage.py shell:*)",
       "Bash(py -m pip:*)",
       "Bash(findstr:*)",
-      "Bash(py manage.py migrate)"
+      "Bash(py manage.py migrate)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

@@ -53,6 +53,51 @@
   width: 100%;
 }
 
+/* Ultimul manifest actualizat */
+.latest-manifest-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.home-button {
+  padding: 12px 20px;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.home-button:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.latest-manifest-info {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.latest-manifest-info strong {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 /* Secțiune căutare */
 .search-section {
   background: white;

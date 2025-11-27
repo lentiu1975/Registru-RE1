@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -122,6 +122,21 @@ export const yearsAPI = {
       const years = response.data.results || response.data;
       const activeYear = years.find(y => y.is_active);
       return activeYear || (years.length > 0 ? years[0] : null);
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+
+export const latestManifestAPI = {
+  get: async (year) => {
+    try {
+      const params = new URLSearchParams();
+      if (year) {
+        params.append('year', year);
+      }
+      const response = await api.get(`/latest-manifest/?${params.toString()}`);
+      return response.data;
     } catch (error) {
       throw error;
     }

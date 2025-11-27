@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     ManifestEntryViewSet, DatabaseYearViewSet, ContainerTypeViewSet,
-    ShipViewSet, PavilionViewSet, get_csrf_token, login_view, logout_view, check_auth_view
+    ShipViewSet, PavilionViewSet, get_csrf_token, login_view, logout_view, check_auth_view,
+    latest_manifest_view
 )
 
 router = DefaultRouter()
@@ -17,5 +18,6 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('check-auth/', check_auth_view, name='check_auth'),
+    path('latest-manifest/', latest_manifest_view, name='latest_manifest'),
     path('', include(router.urls)),
 ]

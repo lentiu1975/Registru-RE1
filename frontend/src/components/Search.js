@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { manifestAPI, yearsAPI, authAPI } from '../services/api';
+import { manifestAPI, yearsAPI, authAPI, latestManifestAPI } from '../services/api';
 import './Search.css';
 
 function Search({ onLogout }) {
@@ -10,11 +10,19 @@ function Search({ onLogout }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [latestManifest, setLatestManifest] = useState(null);
 
   // Încarcă anii disponibili la montare
   useEffect(() => {
     loadYears();
   }, []);
+
+  // Încarcă ultimul manifest când se schimbă anul
+  useEffect(() => {
+    if (selectedYear) {
+      loadLatestManifest();
+    }
+  }, [selectedYear]);
 
   const loadYears = async () => {
     try {
@@ -29,6 +37,16 @@ function Search({ onLogout }) {
       }
     } catch (err) {
       console.error('Error loading years:', err);
+    }
+  };
+
+  const loadLatestManifest = async () => {
+    try {
+      const data = await latestManifestAPI.get(selectedYear);
+      setLatestManifest(data);
+    } catch (err) {
+      console.error('Error loading latest manifest:', err);
+      setLatestManifest(null);
     }
   };
 
@@ -104,13 +122,21 @@ function Search({ onLogout }) {
     }
   };
 
+  const handleHome = () => {
+    // Șterge rezultatele și resetează formularul
+    setResults([]);
+    setCurrentIndex(0);
+    setContainer('');
+    setError('');
+  };
+
   const currentResult = results.length > 0 ? results[currentIndex] : null;
 
   return (
     <div className="search-container">
       <header className="search-header">
         <div className="header-content">
-          <h1>Registru Import {selectedYear || '2025'}</h1>
+          <h1>Registru import RE1 {selectedYear}</h1>
           <button onClick={handleLogout} className="logout-button">
             Deconectare
           </button>
@@ -118,6 +144,18 @@ function Search({ onLogout }) {
       </header>
 
       <div className="search-content">
+        {/* Ultimul manifest actualizat */}
+        {latestManifest && latestManifest.numar_manifest && (
+          <div className="latest-manifest-wrapper">
+            <button onClick={handleHome} className="home-button" title="Înapoi la pagina principală">
+              🏠 Acasă
+            </button>
+            <div className="latest-manifest-info">
+              Ultimul navă actualizată: <strong>{latestManifest.nume_nava || 'N/A'}</strong>, manifest <strong>{latestManifest.numar_manifest}</strong> din data <strong>{latestManifest.data_inregistrare}</strong>
+            </div>
+          </div>
+        )}
+
         {/* Secțiune căutare */}
         <div className="search-section">
           <form onSubmit={handleSearch} className="search-form">
@@ -220,7 +258,19 @@ function Search({ onLogout }) {
 
                 <div className="info-item">
                   <span className="info-label">Număr sumară:</span>
-                  <span className="info-value">{currentResult.numar_sumara || 'N/A'}</span>
+                  <span className="info-value">
+                    {currentResult.numar_sumara ? (
+                      currentResult.numar_sumara.includes(';') || currentResult.numar_sumara.includes(',') ? (
+                        currentResult.numar_sumara.split(/[;,]/).map((item, index) => (
+                          <div key={index}>{item.trim()}</div>
+                        ))
+                      ) : (
+                        currentResult.numar_sumara
+                      )
+                    ) : (
+                      'N/A'
+                    )}
+                  </span>
                 </div>
               </div>
 
@@ -250,6 +300,7 @@ function Search({ onLogout }) {
                       <img
                         src={currentResult.ship_data.pavilion_data.imagine_url}
                         alt="Pavilion"
+                        title={currentResult.ship_data.pavilion_data.nume_tara || currentResult.ship_data.pavilion_data.nume}
                         className="flag-image-inline"
                       />
                     )}

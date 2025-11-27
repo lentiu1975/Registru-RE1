@@ -1,0 +1,92 @@
+╔══════════════════════════════════════════════════════════════╗
+║   CHECKLIST DEPLOYMENT - vama.lentiu.ro                    ║
+║   Aplicația: Registru import RE1                            ║
+╚══════════════════════════════════════════════════════════════╝
+
+📋 PREGĂTIRE LOCALĂ
+══════════════════════════════════════════════════════════════
+[ ] 1. Rulat BUILD_FRONTEND.bat → frontend/build/ creat
+[ ] 2. Verificat că toate fișierele există în proiect
+
+🔐 BAZĂ DE DATE
+══════════════════════════════════════════════════════════════
+[ ] 3. cPanel → MySQL Databases → Creat DB: lentiuro_registru
+[ ] 4. Creat User: lentiuro_admin + parolă NOTATĂ
+[ ] 5. Adăugat user la DB cu ALL PRIVILEGES
+
+📤 UPLOAD BACKEND
+══════════════════════════════════════════════════════════════
+[ ] 6. Creat folder: /home/lentiuro/vama_backend/
+[ ] 7. Upload: manifest_system/, manifests/, media/
+[ ] 8. Upload: passenger_wsgi.py, .htaccess, requirements.txt
+[ ] 9. Upload: manage.py, .env.cpanel
+[ ] 10. Redenumit .env.cpanel → .env
+[ ] 11. Editat .env cu SECRET_KEY și DB password
+
+🐍 PYTHON APP
+══════════════════════════════════════════════════════════════
+[ ] 12. cPanel → Setup Python App → Create Application
+[ ] 13. Python: 3.11/3.12, Root: vama_backend, Entry: application
+[ ] 14. Terminal: cd ~/vama_backend
+[ ] 15. Terminal: source virtualenv/.../bin/activate
+[ ] 16. Terminal: pip install -r requirements.txt
+[ ] 17. Terminal: python manage.py migrate
+[ ] 18. Terminal: python manage.py createsuperuser
+[ ] 19. Terminal: python manage.py collectstatic --noinput
+[ ] 20. Terminal: touch tmp/restart.txt
+
+🎨 UPLOAD FRONTEND
+══════════════════════════════════════════════════════════════
+[ ] 21. Șters conținut vechi din /public_html/
+[ ] 22. Upload tot din frontend/build/ → public_html/
+[ ] 23. Verificat: index.html, static/, manifest.json există
+
+🔒 SSL & DOMENIU
+══════════════════════════════════════════════════════════════
+[ ] 24. cPanel → SSL/TLS Status → Run AutoSSL
+[ ] 25. Verificat certificat instalat (🔒 în browser)
+[ ] 26. Verificat domeniu punctează corect
+
+✅ TESTARE
+══════════════════════════════════════════════════════════════
+[ ] 27. Accesat https://vama.lentiu.ro → vad pagina login
+[ ] 28. Accesat https://vama.lentiu.ro/admin → vad Django admin
+[ ] 29. Login cu superuser → Succes
+[ ] 30. Test căutare container → Funcționează
+[ ] 31. Test upload imagine → Funcționează
+
+🔐 SECURITATE FINALĂ
+══════════════════════════════════════════════════════════════
+[ ] 32. Verificat DEBUG=False în .env
+[ ] 33. Verificat SECRET_KEY e unic (nu cel default)
+[ ] 34. SCHIMBAT PAROLA cPanel IMEDIAT!
+
+══════════════════════════════════════════════════════════════
+
+✏️ NOTE IMPORTANTE:
+
+DB Name: lentiuro_registru
+DB User: lentiuro_admin
+DB Pass: _____________________________
+
+Superuser: _____________________________
+Superuser Pass: _____________________________
+
+Backend Path: /home/lentiuro/vama_backend/
+Frontend Path: /home/lentiuro/public_html/
+Virtualenv: /home/lentiuro/virtualenv/vama_backend/3.11/
+
+Restart Command:
+  touch ~/vama_backend/tmp/restart.txt
+
+Logs:
+  tail -f ~/vama_backend/logs/error.log
+
+══════════════════════════════════════════════════════════════
+
+🎉 DEPLOYMENT COMPLET!
+
+Frontend: https://vama.lentiu.ro
+Admin: https://vama.lentiu.ro/admin
+
+══════════════════════════════════════════════════════════════

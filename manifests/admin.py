@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.db import models
 from django.shortcuts import render, redirect
@@ -302,13 +304,13 @@ class DatabaseYearAdmin(admin.ModelAdmin):
 @admin.register(Pavilion)
 class PavilionAdmin(admin.ModelAdmin):
     """Admin pentru pavilioane"""
-    list_display = ['nume', 'preview_imagine', 'ships_count', 'created_at']
-    search_fields = ['nume']
+    list_display = ['nume', 'nume_tara', 'preview_imagine', 'ships_count', 'created_at']
+    search_fields = ['nume', 'nume_tara']
     readonly_fields = ['preview_imagine_large', 'created_at', 'updated_at']
 
     fieldsets = (
         ('Informatii Pavilion', {
-            'fields': ('nume', 'imagine', 'preview_imagine_large')
+            'fields': ('nume', 'nume_tara', 'imagine', 'preview_imagine_large')
         }),
         ('Metadata', {
             'fields': ('created_at', 'updated_at'),
@@ -431,7 +433,49 @@ class ContainerTypeAdmin(admin.ModelAdmin):
     extract_unique_containers.short_description = 'Extrage containere unice din manifeste'
 
 
+# Customizare User Admin pentru renumire campuri
+class CustomUserAdmin(BaseUserAdmin):
+    """Admin personalizat pentru utilizatori cu campuri redenumite"""
+
+    # Customizam fieldsets pentru a redenumi campurile
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Informații personale', {'fields': ('first_name', 'last_name', 'email')}),
+        ('Permisiuni', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        ('Date importante', {'fields': ('last_login', 'date_joined')}),
+    )
+
+    # Customizam list_display pentru renumirea campurilor
+    list_display = ('username', 'email', 'get_full_name_custom', 'get_company_name', 'is_staff')
+
+    def get_full_name_custom(self, obj):
+        """Afiseaza first_name ca 'Nume si prenume'"""
+        return obj.first_name or '-'
+    get_full_name_custom.short_description = 'Nume si prenume'
+
+    def get_company_name(self, obj):
+        """Afiseaza last_name ca 'Nume companie'"""
+        return obj.last_name or '-'
+    get_company_name.short_description = 'Nume companie'
+
+    # Suprascriu get_form pentru a customiza label-urile campurilor
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'first_name' in form.base_fields:
+            form.base_fields['first_name'].label = 'Nume si prenume'
+        if 'last_name' in form.base_fields:
+            form.base_fields['last_name'].label = 'Nume companie'
+        return form
+
+
+# Inregistrare User Admin personalizat
+admin.site.unregister(User)
+admin.site.register(User, CustomUserAdmin)
+
+
 # Customizare titluri admin
-admin.site.site_header = "Registru Import 2025"
-admin.site.site_title = "Registru Import 2025"
+admin.site.site_header = "Registru import RE1"
+admin.site.site_title = "Registru import RE1"
 admin.site.index_title = "Administrare Registru Import"

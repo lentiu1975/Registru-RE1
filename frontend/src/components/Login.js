@@ -28,7 +28,7 @@ function Login({ onLoginSuccess }) {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <h1>Registru Import 2025</h1>
+          <h1>Registru import RE1</h1>
           <p>Sistem de Gestiune Manifeste</p>
         </div>
 

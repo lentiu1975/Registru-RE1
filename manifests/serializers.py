@@ -18,7 +18,7 @@ class PavilionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pavilion
-        fields = ['id', 'nume', 'imagine', 'imagine_url', 'created_at']
+        fields = ['id', 'nume', 'nume_tara', 'imagine', 'imagine_url', 'created_at']
         read_only_fields = ['id', 'created_at']
 
     def get_imagine_url(self, obj):

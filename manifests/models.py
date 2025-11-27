@@ -38,6 +38,7 @@ class ContainerType(models.Model):
 class Pavilion(models.Model):
     """Model pentru pavilioane nave cu imagini"""
     nume = models.CharField(max_length=100, unique=True, verbose_name="Nume Pavilion")
+    nume_tara = models.CharField(max_length=100, blank=True, verbose_name="Nume Țară")
     imagine = models.ImageField(upload_to='pavilions/', null=True, blank=True, verbose_name="Imagine Pavilion")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizat la")

@@ -1,0 +1,12 @@
+# Configurație pentru servirea aplicației Django prin Passenger
+PassengerEnabled On
+PassengerAppRoot /home/lentiuro/vama_backend
+
+# Python Path - Ajustați versiunea (3.11, 3.12, 3.13, 3.14) conform Setup Python App
+PassengerPython /home/lentiuro/virtualenv/vama_backend/3.11/bin/python3.11
+
+# Rewrite rules pentru static și media files
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/static/
+RewriteCond %{REQUEST_URI} !^/media/
+RewriteRule ^(.*)$ /passenger_wsgi.py [L]

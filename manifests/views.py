@@ -7,7 +7,7 @@ from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.db.models import Q
+from django.db.models import Q, Max
 from .models import ManifestEntry, DatabaseYear, ContainerType, Ship, Pavilion
 from .serializers import (
     ManifestEntrySerializer, ManifestSearchSerializer,
@@ -185,3 +185,46 @@ class PavilionViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ['nume']
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def latest_manifest_view(request):
+    """
+    Endpoint pentru obtinerea ultimului manifest actualizat
+    Returneaza numarul manifest cel mai mare si data cea mai recenta
+    """
+    year = request.GET.get('year')
+
+    queryset = ManifestEntry.objects.all()
+
+    # Filtru dupa an
+    if year:
+        try:
+            year_obj = DatabaseYear.objects.get(year=int(year))
+            queryset = queryset.filter(database_year=year_obj)
+        except DatabaseYear.DoesNotExist:
+            pass
+    else:
+        # Foloseste anul activ
+        active_year = DatabaseYear.objects.filter(is_active=True).first()
+        if active_year:
+            queryset = queryset.filter(database_year=active_year)
+
+    # Gaseste intrarea cu data_inregistrare cea mai recenta
+    latest_entry = queryset.filter(
+        data_inregistrare__isnull=False
+    ).order_by('-data_inregistrare', '-numar_manifest').first()
+
+    if latest_entry:
+        return Response({
+            'numar_manifest': latest_entry.numar_manifest,
+            'data_inregistrare': latest_entry.data_inregistrare.strftime('%d.%m.%Y') if latest_entry.data_inregistrare else None,
+            'nume_nava': latest_entry.nume_nava or None
+        })
+    else:
+        return Response({
+            'numar_manifest': None,
+            'data_inregistrare': None,
+            'nume_nava': None
+        })
