@@ -378,11 +378,32 @@ class ShipAdmin(admin.ModelAdmin):
     entries_count.short_description = 'Intrari'
 
 
+# Filtru custom pentru containere cu/fara imagine
+class HasImageFilter(admin.SimpleListFilter):
+    """Filtru pentru containere cu sau fara imagine"""
+    title = 'are imagine'
+    parameter_name = 'has_image'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Cu imagine'),
+            ('no', 'Fără imagine'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.exclude(imagine='')
+        if self.value() == 'no':
+            return queryset.filter(imagine='')
+        return queryset
+
+
 # Admin pentru ContainerType
 @admin.register(ContainerType)
 class ContainerTypeAdmin(admin.ModelAdmin):
     """Admin pentru tipuri containere cu extragere automata din ManifestEntry"""
     list_display = ['model_container', 'tip_container', 'preview_imagine', 'entries_count', 'created_at']
+    list_filter = ['tip_container', HasImageFilter]
     search_fields = ['model_container', 'tip_container']
     readonly_fields = ['preview_imagine_large', 'created_at', 'updated_at']
     actions = ['extract_unique_containers']

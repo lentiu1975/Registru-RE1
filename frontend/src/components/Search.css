@@ -293,6 +293,18 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
+.info-item.info-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.info-col {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
 .info-item.description {
   flex-direction: column;
   gap: 8px;

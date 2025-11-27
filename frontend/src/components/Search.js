@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { manifestAPI, yearsAPI, authAPI, latestManifestAPI } from '../services/api';
 import './Search.css';
 
@@ -11,6 +11,7 @@ function Search({ onLogout }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [latestManifest, setLatestManifest] = useState(null);
+  const containerInputRef = useRef(null);
 
   // Încarcă anii disponibili la montare
   useEffect(() => {
@@ -83,6 +84,11 @@ function Search({ onLogout }) {
       if (data && data.length > 0) {
         setResults(data);
         setCurrentIndex(0);
+        setContainer(''); // Golește câmpul de căutare după căutare reușită
+        // Setează focusul înapoi pe câmpul de căutare
+        setTimeout(() => {
+          containerInputRef.current?.focus();
+        }, 100);
       } else {
         setResults([]);
         setError('Nu au fost găsite rezultate');
@@ -181,6 +187,7 @@ function Search({ onLogout }) {
                 <input
                   type="text"
                   id="container"
+                  ref={containerInputRef}
                   value={container}
                   onChange={(e) => setContainer(e.target.value)}
                   placeholder="Ex: ABCD1234567"
@@ -241,14 +248,24 @@ function Search({ onLogout }) {
                   {currentResult.numar_manifest}/{currentResult.numar_permis}/{currentResult.numar_pozitie}/{currentResult.cerere_operatiune} – {currentResult.data_inregistrare_formatted || currentResult.data_inregistrare}
                 </div>
 
-                <div className="info-item">
-                  <span className="info-label">Colete:</span>
-                  <span className="info-value">{currentResult.numar_colete || 'N/A'}</span>
+                <div className="info-item info-row">
+                  <div className="info-col">
+                    <span className="info-label">Colete:</span>
+                    <span className="info-value">{currentResult.numar_colete || 'N/A'}</span>
+                  </div>
+                  <div className="info-col">
+                    <span className="info-label">Greutate:</span>
+                    <span className="info-value">{currentResult.greutate_bruta ? `${currentResult.greutate_bruta} Kg` : 'N/A'}</span>
+                  </div>
                 </div>
 
                 <div className="info-item">
-                  <span className="info-label">Greutate:</span>
-                  <span className="info-value">{currentResult.greutate_bruta ? `${currentResult.greutate_bruta} Kg` : 'N/A'}</span>
+                  <span className="info-label">Tip operațiune:</span>
+                  <span className="info-value">
+                    {currentResult.tip_operatiune === 'I' ? 'Import' :
+                     currentResult.tip_operatiune === 'T' ? 'Transhipment' :
+                     currentResult.tip_operatiune || 'N/A'}
+                  </span>
                 </div>
 
                 <div className="info-item description">
@@ -279,17 +296,14 @@ function Search({ onLogout }) {
                 {/* Secțiune Container */}
                 <div className="container-section">
                   <div className="container-title">{currentResult.container || 'Container necunoscut'}</div>
-                  {currentResult.container_type_data && currentResult.container_type_data.imagine_url ? (
-                    <img
-                      src={currentResult.container_type_data.imagine_url}
-                      alt="Container"
-                      className="container-image-large"
-                    />
-                  ) : (
-                    <div className="image-placeholder-large">
-                      <p>Fără imagine container</p>
-                    </div>
-                  )}
+                  <img
+                    src={currentResult.container_type_data?.imagine_url || 'http://localhost:8000/media/container_types/Container.png'}
+                    alt="Container"
+                    className="container-image-large"
+                    onError={(e) => {
+                      e.target.src = 'http://localhost:8000/media/container_types/Container.png';
+                    }}
+                  />
                 </div>
 
                 {/* Secțiune Navă */}
