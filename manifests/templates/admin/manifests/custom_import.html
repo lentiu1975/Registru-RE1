@@ -1,0 +1,411 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Import Personalizat - Registru Import{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .import-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .import-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .import-header h1 {
+        margin: 0;
+        color: #333;
+        font-size: 28px;
+    }
+
+    .import-form {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #333;
+        font-size: 15px;
+    }
+
+    .form-group select,
+    .form-group input[type="file"],
+    .form-group input[type="text"],
+    .form-group input[type="date"] {
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .form-group select:focus,
+    .form-group input[type="file"]:focus,
+    .form-group input[type="text"]:focus,
+    .form-group input[type="date"]:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .manual-fields {
+        background: #f0f7ff;
+        padding: 20px;
+        border-radius: 8px;
+        border: 2px solid #667eea;
+        margin: 20px 0;
+    }
+
+    .manual-fields h3 {
+        margin: 0 0 15px 0;
+        color: #667eea;
+        font-size: 18px;
+    }
+
+    .manual-fields-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .manual-fields-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .template-info {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border-left: 4px solid #667eea;
+        margin-top: 10px;
+        display: none;
+    }
+
+    .template-info.active {
+        display: block;
+    }
+
+    .template-info h3 {
+        margin: 0 0 10px 0;
+        color: #667eea;
+        font-size: 16px;
+    }
+
+    .template-info p {
+        margin: 5px 0;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .template-info .mapping {
+        background: white;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 10px;
+        font-family: monospace;
+        font-size: 13px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .btn-submit {
+        padding: 14px 30px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background: #5568d3;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-submit:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-cancel {
+        padding: 14px 30px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+        color: white;
+    }
+
+    .help-text {
+        color: #666;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .templates-list {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 2px solid #e0e0e0;
+    }
+
+    .templates-list h2 {
+        margin: 0 0 20px 0;
+        color: #333;
+        font-size: 22px;
+    }
+
+    .template-card {
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .template-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    }
+
+    .template-card h3 {
+        margin: 0 0 10px 0;
+        color: #667eea;
+        font-size: 18px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="import-container">
+    <div class="import-header">
+        <h1>📥 Import Personalizat Manifest</h1>
+        <p class="help-text">Încărcați un fișier Excel (XLS/XLSX) folosind un template de import predefinit</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" style="padding: 15px; margin-bottom: 20px; border-radius: 6px;
+                background: {% if message.tags == 'success' %}#d4edda{% elif message.tags == 'error' %}#f8d7da{% else %}#d1ecf1{% endif %};
+                color: {% if message.tags == 'success' %}#155724{% elif message.tags == 'error' %}#721c24{% else %}#0c5460{% endif %};
+                border: 1px solid {% if message.tags == 'success' %}#c3e6cb{% elif message.tags == 'error' %}#f5c6cb{% else %}#bee5eb{% endif %};">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="import-form" id="importForm">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="template_id">Selectați Template Import *</label>
+            <select name="template_id" id="template_id" required>
+                <option value="">-- Alegeți un template --</option>
+                {% for template in templates %}
+                    <option value="{{ template.id }}"
+                            data-format="{{ template.format_fisier }}"
+                            data-start="{{ template.rand_start }}"
+                            data-mapping="{{ template.mapare_coloane|escapejs }}"
+                            data-description="{{ template.descriere|escapejs }}">
+                        {{ template.nume }} ({{ template.format_fisier|upper }}, începe de la rândul {{ template.rand_start }})
+                    </option>
+                {% endfor %}
+            </select>
+            <div id="templateInfo" class="template-info">
+                <h3>Detalii Template</h3>
+                <p><strong>Format fișier:</strong> <span id="infoFormat"></span></p>
+                <p><strong>Rând început:</strong> <span id="infoStart"></span></p>
+                <p><strong>Descriere:</strong> <span id="infoDescription"></span></p>
+                <div id="infoMapping" class="mapping"></div>
+            </div>
+        </div>
+
+        <div class="manual-fields">
+            <h3>✏️ Câmpuri Manuale (aplicate la toate rândurile importate)</h3>
+            <div class="manual-fields-grid">
+                <div class="form-group">
+                    <label for="numar_manifest">Număr Manifest *</label>
+                    <input type="text" name="numar_manifest" id="numar_manifest" required placeholder="Ex: 2025/001">
+                    <span class="help-text">Numărul manifestului pentru toate containerele importate</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="numar_permis">Număr Permis</label>
+                    <input type="text" name="numar_permis" id="numar_permis" placeholder="Ex: P2025/001">
+                    <span class="help-text">Numărul permisului (opțional)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="data_inregistrare">Data Înregistrare</label>
+                    <input type="date" name="data_inregistrare" id="data_inregistrare">
+                    <span class="help-text">Format: ZZ.LL.AAAA (ex: 28.11.2025)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="cerere_operatiune">Cerere Operațiune</label>
+                    <input type="text" name="cerere_operatiune" id="cerere_operatiune" placeholder="Ex: Import">
+                    <span class="help-text">Tipul cererii de operațiune (opțional)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="nume_nava">Nume Navă</label>
+                    <input type="text" name="nume_nava" id="nume_nava" placeholder="Ex: MSC MONACO">
+                    <span class="help-text">Numele navei (opțional)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="pavilion_nava">Pavilion Navă</label>
+                    <input type="text" name="pavilion_nava" id="pavilion_nava" placeholder="Ex: PANAMA">
+                    <span class="help-text">Pavilionul navei (opțional)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="file">Încărcați Fișier Excel *</label>
+            <input type="file" name="file" id="file" accept=".xls,.xlsx" required>
+            <span class="help-text">Formate acceptate: XLS, XLSX</span>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn-submit" id="submitBtn">
+                🚀 Procesează Import
+            </button>
+            <a href="{% url 'admin:manifests_manifestentry_changelist' %}" class="btn-cancel">
+                ❌ Anulează
+            </a>
+        </div>
+    </form>
+
+    {% if templates %}
+    <div class="templates-list">
+        <h2>📋 Template-uri Disponibile ({{ templates.count }})</h2>
+        {% for template in templates %}
+        <div class="template-card">
+            <h3>{{ template.nume }}</h3>
+            {% if template.descriere %}
+                <p><strong>Descriere:</strong> {{ template.descriere }}</p>
+            {% endif %}
+            <p><strong>Format:</strong> {{ template.format_fisier|upper }} | <strong>Rând început:</strong> {{ template.rand_start }}</p>
+            <p><strong>Creat la:</strong> {{ template.created_at|date:"d.m.Y H:i" }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="templates-list">
+        <h2>⚠️ Niciun Template Disponibil</h2>
+        <p>Vă rugăm să creați mai întâi un template de import în secțiunea <a href="{% url 'admin:manifests_importtemplate_add' %}">Template-uri Import</a>.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const templateSelect = document.getElementById('template_id');
+    const templateInfo = document.getElementById('templateInfo');
+    const fileInput = document.getElementById('file');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Afișează detalii template când se selectează
+    templateSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+
+        if (this.value) {
+            const format = selectedOption.dataset.format;
+            const start = selectedOption.dataset.start;
+            const description = selectedOption.dataset.description || 'Fără descriere';
+
+            // Parse JSON cu error handling
+            let mapping = {};
+            try {
+                const mappingData = selectedOption.dataset.mapping || '{}';
+                mapping = JSON.parse(mappingData);
+            } catch (e) {
+                console.error('Eroare la parsarea mapării:', e);
+                mapping = {};
+            }
+
+            document.getElementById('infoFormat').textContent = format.toUpperCase();
+            document.getElementById('infoStart').textContent = start;
+            document.getElementById('infoDescription').textContent = description;
+
+            // Afișează maparea coloanelor
+            const mappingDiv = document.getElementById('infoMapping');
+            if (Object.keys(mapping).length > 0) {
+                let mappingHtml = '<strong>Mapare coloane:</strong><br>';
+                for (const [dbField, excelCol] of Object.entries(mapping)) {
+                    mappingHtml += `<div style="margin: 3px 0;">"<span style="color: #667eea;">${dbField}</span>" ← "<span style="color: #28a745;">${excelCol}</span>"</div>`;
+                }
+                mappingDiv.innerHTML = mappingHtml;
+            } else {
+                mappingDiv.innerHTML = '<em>Nicio mapare configurată</em>';
+            }
+
+            templateInfo.classList.add('active');
+        } else {
+            templateInfo.classList.remove('active');
+        }
+    });
+
+    // Validare format fișier
+    fileInput.addEventListener('change', function() {
+        if (templateSelect.value && this.files.length > 0) {
+            const selectedOption = templateSelect.options[templateSelect.selectedIndex];
+            const templateFormat = selectedOption.dataset.format;
+            const fileName = this.files[0].name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+
+            if (fileExtension !== templateFormat) {
+                alert(`⚠️ Atenție: Ați selectat un template pentru fișiere ${templateFormat.toUpperCase()}, dar ați încărcat un fișier .${fileExtension.toUpperCase()}.\n\nVă rugăm să încărcați un fișier compatibil sau să selectați un alt template.`);
+            }
+        }
+    });
+
+    // Dezactivare buton submit în timpul procesării
+    document.getElementById('importForm').addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳ Se procesează...';
+    });
+});
+</script>
+{% endblock %}

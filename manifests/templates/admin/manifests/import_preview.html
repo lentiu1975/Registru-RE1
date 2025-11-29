@@ -1,0 +1,342 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .preview-container {
+        max-width: 1600px;
+        margin: 30px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .preview-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .preview-header h1 {
+        margin: 0 0 15px 0;
+        color: #333;
+        font-size: 28px;
+    }
+
+    .summary-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .summary-item {
+        text-align: center;
+    }
+
+    .summary-item h3 {
+        margin: 0 0 5px 0;
+        font-size: 14px;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .summary-item .value {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .manual-fields-display {
+        background: #f0f7ff;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+        margin-bottom: 30px;
+    }
+
+    .manual-fields-display h3 {
+        margin: 0 0 15px 0;
+        color: #667eea;
+        font-size: 18px;
+    }
+
+    .manual-fields-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .manual-field-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .manual-field-item label {
+        font-weight: 600;
+        color: #555;
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .manual-field-item .value {
+        color: #333;
+        font-size: 15px;
+        padding: 8px;
+        background: white;
+        border-radius: 4px;
+    }
+
+    .preview-table-wrapper {
+        overflow-x: auto;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .preview-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        min-width: 1200px;
+    }
+
+    .preview-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .preview-table th {
+        padding: 15px 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .preview-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background-color 0.2s;
+    }
+
+    .preview-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .preview-table tbody tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+
+    .preview-table tbody tr:nth-child(even):hover {
+        background-color: #f0f0f0;
+    }
+
+    .preview-table td {
+        padding: 12px;
+        font-size: 13px;
+        color: #333;
+    }
+
+    .row-number {
+        font-weight: 700;
+        color: #667eea;
+        text-align: center;
+        width: 50px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px solid #e0e0e0;
+    }
+
+    .btn-confirm {
+        padding: 16px 50px;
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+    }
+
+    .btn-cancel {
+        padding: 16px 50px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(220, 53, 69, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-cancel:hover {
+        background: #c82333;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+    }
+
+    .info-notice {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        color: #856404;
+        font-size: 14px;
+    }
+
+    .info-notice strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="preview-container">
+    <div class="preview-header">
+        <h1>👁️ Previzualizare Date Import</h1>
+        <p style="color: #666; margin: 10px 0 0 0;">Verificați datele înainte de a confirma importul</p>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-item">
+            <h3>Înregistrări Totale</h3>
+            <p class="value">{{ total_entries }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Template Utilizat</h3>
+            <p class="value" style="font-size: 20px;">{{ template_name }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Afișate în preview</h3>
+            <p class="value">{{ preview_entries|length }}</p>
+        </div>
+    </div>
+
+    {% if total_entries > 50 %}
+    <div class="info-notice">
+        <strong>ℹ️ Notă:</strong>
+        Sunt afișate primele 50 de înregistrări pentru previzualizare. La confirmarea importului, toate cele {{ total_entries }} înregistrări vor fi salvate în baza de date.
+    </div>
+    {% endif %}
+
+    <div class="manual-fields-display">
+        <h3>📝 Câmpuri Manuale (aplicate la toate rândurile)</h3>
+        <div class="manual-fields-grid">
+            <div class="manual-field-item">
+                <label>Număr Manifest:</label>
+                <div class="value">{{ manual_fields.numar_manifest|default:"-" }}</div>
+            </div>
+            <div class="manual-field-item">
+                <label>Număr Permis:</label>
+                <div class="value">{{ manual_fields.numar_permis|default:"-" }}</div>
+            </div>
+            <div class="manual-field-item">
+                <label>Data Înregistrare:</label>
+                <div class="value">{{ manual_fields.data_inregistrare|default:"-" }}</div>
+            </div>
+            <div class="manual-field-item">
+                <label>Cerere Operațiune:</label>
+                <div class="value">{{ manual_fields.cerere_operatiune|default:"-" }}</div>
+            </div>
+            <div class="manual-field-item">
+                <label>Nume Navă:</label>
+                <div class="value">{{ manual_fields.nume_nava|default:"-" }}</div>
+            </div>
+            <div class="manual-field-item">
+                <label>Pavilion Navă:</label>
+                <div class="value">{{ manual_fields.pavilion_nava|default:"-" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <h2 style="margin: 30px 0 15px 0; color: #333; font-size: 22px;">📋 Date din Excel</h2>
+
+    <div class="preview-table-wrapper">
+        <table class="preview-table">
+            <thead>
+                <tr>
+                    <th class="row-number">#</th>
+                    <th>Container</th>
+                    <th>Nr. Poziție</th>
+                    <th>Tip Container</th>
+                    <th>Tip Op.</th>
+                    <th>Nr. Colete</th>
+                    <th>Greutate Brută (kg)</th>
+                    <th>Descriere Marfă</th>
+                    <th>Nr. Sumara</th>
+                    <th>Linie Maritimă</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in preview_entries %}
+                <tr>
+                    <td class="row-number">{{ forloop.counter }}</td>
+                    <td><strong>{{ entry.container|default:"-" }}</strong></td>
+                    <td>{{ entry.numar_pozitie|default:"-" }}</td>
+                    <td>{{ entry.tip_container|default:"-" }}</td>
+                    <td>{{ entry.tip_operatiune|default:"-" }}</td>
+                    <td>{{ entry.numar_colete|default:"-" }}</td>
+                    <td>{{ entry.greutate_bruta|default:"-" }}</td>
+                    <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ entry.descriere_marfa|default:"-" }}
+                    </td>
+                    <td>{{ entry.numar_sumara|default:"-" }}</td>
+                    <td>{{ entry.linie_maritima|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <form method="post" action="{% url 'admin:manifests_manifestentry_custom_import' %}">
+        {% csrf_token %}
+        <input type="hidden" name="confirm_import" value="true">
+
+        <div class="button-group">
+            <button type="submit" class="btn-confirm">
+                ✅ Confirmă și Salvează Import
+            </button>
+            <a href="{% url 'admin:manifests_manifestentry_custom_import' %}" class="btn-cancel">
+                ❌ Anulează Import
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

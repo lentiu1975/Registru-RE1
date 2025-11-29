@@ -96,6 +96,7 @@ class ManifestEntry(models.Model):
     numar_sumara = models.CharField(max_length=100, blank=True, null=True, verbose_name="Numar Sumara")
     tip_container = models.CharField(max_length=50, blank=True, verbose_name="Tip Container")
     linie_maritima = models.CharField(max_length=200, blank=True, verbose_name="Linie Maritima")
+    observatii = models.TextField(blank=True, verbose_name="Observatii")
 
     # Coloana generata automat
     model_container = models.CharField(max_length=100, blank=True, editable=False, verbose_name="Model Container")
@@ -182,3 +183,30 @@ class ManifestEntry(models.Model):
 
     def __str__(self):
         return f"{self.numar_manifest} - {self.container}"
+
+
+class ImportTemplate(models.Model):
+    """Model pentru salvarea configuratiilor de import personalizat"""
+
+    nume = models.CharField(max_length=200, unique=True, verbose_name="Nume Template")
+    descriere = models.TextField(blank=True, verbose_name="Descriere")
+
+    # Configurari import
+    rand_start = models.IntegerField(default=2, verbose_name="Rând de început", help_text="Primul rând cu date (nu header)")
+    format_fisier = models.CharField(max_length=10, choices=[('xls', 'XLS'), ('xlsx', 'XLSX')], default='xlsx', verbose_name="Format Fișier")
+
+    # Mapare coloane - JSON cu structura {"camp_baza": "nume_coloana_excel"}
+    mapare_coloane = models.JSONField(default=dict, verbose_name="Mapare Coloane",
+        help_text='Ex: {"numar_manifest": "numar manifest", "container": "container"}')
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizat la")
+
+    class Meta:
+        verbose_name = "Template Import"
+        verbose_name_plural = "Template-uri Import"
+        ordering = ['nume']
+
+    def __str__(self):
+        return self.nume

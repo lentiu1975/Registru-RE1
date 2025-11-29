@@ -1,0 +1,304 @@
+/* Custom CSS pentru Admin Django - Rezolutie 1920px */
+
+/* Elimina scroll orizontal complet */
+html {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+}
+
+body {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Wrapper general */
+#main {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+/* Container principal - limitat la 1920px */
+#container {
+    max-width: 1920px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+}
+
+/* Header - limitat sa nu iasa din pagina */
+#header {
+    max-width: 1920px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+
+/* Sidebar Navigation - limitat */
+#nav-sidebar {
+    max-width: 275px !important;
+    box-sizing: border-box !important;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    max-width: 1920px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 10px 30px !important;
+    box-sizing: border-box !important;
+}
+
+/* Content area - limitat pentru a se incadra */
+#content {
+    max-width: 1820px !important;
+    width: calc(100% - 100px) !important;
+    padding: 20px 30px !important;
+    margin: 0 auto !important;
+}
+
+/* Content-main - zona principala de continut */
+#content-main {
+    max-width: 100% !important;
+}
+
+/* Changelist (lista de obiecte) */
+#changelist {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Cand sidebar-ul este inchis, pastreaza aceeasi latime */
+body.main-sidebar-closed #content {
+    max-width: 1820px !important;
+    width: calc(100% - 100px) !important;
+    margin: 0 auto !important;
+}
+
+/* Tabel rezultate */
+#result_list {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Formular de edit */
+#content-main {
+    max-width: 1920px !important;
+    width: 100% !important;
+}
+
+/* Sidebar filters - ascundem sidebar-ul din dreapta dar lasam accesibil pentru JS */
+#changelist-filter {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+}
+
+/* Main content fara filter sidebar - ocupa toata latimea */
+.filtered #changelist-form {
+    margin-right: 0 !important;
+}
+
+/* Toolbar cu filtre pe aceeași linie cu search */
+#toolbar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 15px !important;
+}
+
+/* Mutam filtrele deasupra tabelului ca drop-down */
+#changelist .actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 15px !important;
+    align-items: center !important;
+    margin-bottom: 15px !important;
+    padding: 15px !important;
+    background: #f8f9fa !important;
+    border-radius: 6px !important;
+}
+
+/* Container pentru filtrele mutate */
+.moved-filters {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 15px !important;
+    align-items: center !important;
+    margin-left: 15px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Label pentru filtre */
+.moved-filters label {
+    font-weight: 600 !important;
+    color: #333 !important;
+    font-size: 14px !important;
+    margin-right: 10px !important;
+}
+
+/* Dropdown-uri pentru filtre */
+.moved-filters select {
+    padding: 10px 12px !important;
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    height: auto !important;
+    min-height: 40px !important;
+    background: white !important;
+    cursor: pointer !important;
+    min-width: 200px !important;
+    font-family: inherit !important;
+}
+
+.moved-filters select:hover {
+    border-color: #667eea !important;
+}
+
+.moved-filters select:focus {
+    outline: none !important;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+}
+
+/* Header */
+#header {
+    max-width: 1920px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    max-width: 1920px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 10px 30px !important;
+}
+
+/* Coloane tabel - ajustare pentru multe coloane cu redimensionare */
+#result_list th,
+#result_list td {
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+}
+
+/* Header-uri cu poziție relativă pentru resizer */
+#result_list thead th {
+    position: relative !important;
+    padding-right: 20px !important;
+    min-width: 50px !important;
+    border-right: 1px solid #ddd !important;
+}
+
+/* Ultima coloană fără border */
+#result_list thead th:last-child {
+    border-right: none !important;
+}
+
+/* Layout tabel cu coloane flexibile */
+#result_list {
+    table-layout: fixed !important;
+    width: 100% !important;
+}
+
+/* Stilizare resizer coloană */
+.column-resizer {
+    z-index: 10 !important;
+}
+
+.column-resizer:hover {
+    background: rgba(0, 120, 215, 0.5) !important;
+}
+
+/* Text wrap pentru descrieri lungi */
+#result_list td[class*="descriere"],
+#result_list td[class*="description"] {
+    white-space: normal !important;
+    max-width: 300px !important;
+    word-wrap: break-word !important;
+}
+
+/* Optimizare pentru tabele mari */
+.results {
+    overflow-x: auto !important;
+    max-width: 100% !important;
+}
+
+/* Actions */
+.actions {
+    max-width: 100% !important;
+}
+
+/* Pagination */
+.paginator {
+    max-width: 100% !important;
+}
+
+/* Module tables */
+.module table {
+    width: 100% !important;
+}
+
+/* Dashboard */
+#content-main .module {
+    max-width: 100% !important;
+}
+
+/* Responsive pentru rezolutii mai mici */
+@media (max-width: 1920px) {
+    #container,
+    #content,
+    #header,
+    .breadcrumbs {
+        max-width: 100% !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+}
+
+/* Fix pentru scroll orizontal */
+body {
+    overflow-x: auto !important;
+}
+
+.results {
+    overflow-x: auto !important;
+}
+
+/* Imagini preview in admin - optimizare spatiu */
+img[width="50"],
+img[width="60"] {
+    max-width: 50px !important;
+    height: auto !important;
+}
+
+/* Evidențiere containere duplicate */
+.duplicate-container {
+    background-color: #fff3cd !important;
+    font-weight: bold !important;
+}
+
+.duplicate-container:hover {
+    background-color: #ffe69c !important;
+}
+
+/* Evidențiere containere cu observații */
+.has-observations {
+    background-color: #f8d7da !important;
+    font-weight: bold !important;
+}
+
+.has-observations:hover {
+    background-color: #f5c2c7 !important;
+}

@@ -1,0 +1,362 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .mapare-container {
+        max-width: 1400px;
+        margin: 30px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .mapare-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .mapare-header h1 {
+        margin: 0 0 10px 0;
+        color: #333;
+        font-size: 28px;
+    }
+
+    .template-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 15px;
+    }
+
+    .template-info p {
+        margin: 5px 0;
+        color: #666;
+    }
+
+    .instructions {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px 20px;
+        margin-bottom: 30px;
+        border-radius: 4px;
+    }
+
+    .instructions h3 {
+        margin: 0 0 10px 0;
+        color: #1976d2;
+        font-size: 18px;
+    }
+
+    .instructions ul {
+        margin: 10px 0;
+        padding-left: 20px;
+    }
+
+    .instructions li {
+        margin: 5px 0;
+        color: #555;
+    }
+
+    .mapping-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .mapping-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .mapping-table th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+    .mapping-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background-color 0.2s;
+    }
+
+    .mapping-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .mapping-table tbody tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+
+    .mapping-table tbody tr:nth-child(even):hover {
+        background-color: #f0f0f0;
+    }
+
+    .mapping-table td {
+        padding: 12px 15px;
+    }
+
+    .field-number {
+        font-weight: 700;
+        color: #667eea;
+        font-size: 14px;
+        text-align: center;
+        width: 50px;
+    }
+
+    .field-label {
+        font-weight: 600;
+        color: #333;
+        min-width: 200px;
+    }
+
+    .field-name {
+        font-family: 'Courier New', monospace;
+        color: #666;
+        font-size: 13px;
+        background: #f5f5f5;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .excel-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .excel-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .excel-input.filled {
+        border-color: #4caf50;
+        background-color: #f1f8f4;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px solid #e0e0e0;
+    }
+
+    .btn-save {
+        padding: 14px 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-cancel {
+        padding: 14px 40px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .stats {
+        text-align: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    .stats-number {
+        font-size: 32px;
+        font-weight: 700;
+        color: #667eea;
+        margin: 0;
+    }
+
+    .stats-label {
+        color: #666;
+        margin: 5px 0 0 0;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mapare-container">
+    <div class="mapare-header">
+        <h1>🗺️ Mapare Coloane</h1>
+        <div class="template-info">
+            <p><strong>Template:</strong> {{ template.nume }}</p>
+            <p><strong>Format fișier:</strong> {{ template.format_fisier|upper }}</p>
+            <p><strong>Rând început:</strong> {{ template.rand_start }}</p>
+            {% if template.descriere %}
+                <p><strong>Descriere:</strong> {{ template.descriere }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>📋 Instrucțiuni</h3>
+        <ul>
+            <li>În coloana <strong>"Coloană Excel"</strong>, introduceți litera coloanei din Excel (A, B, C, etc.)</li>
+            <li>Exemplu: dacă "Container" se află în coloana C din Excel, scrieți <strong>C</strong></li>
+            <li>Nu este obligatoriu să completați toate câmpurile - completați doar coloanele pe care le aveți în Excel</li>
+            <li>Coloanele completate vor fi evidențiate cu verde</li>
+            <li>Rândul de început este setat la {{ template.rand_start }} (se va citi de la acest rând)</li>
+            <li><strong>Notă:</strong> Câmpurile <em>Numar Manifest, Numar Permis, Data Inregistrare, Cerere Operatiune, Nume Nava, Pavilion Nava</em> se introduc manual la import, nu se mapează aici</li>
+            <li><strong>Tip Operatiune:</strong> Puteți folosi valorile IMP (convertit automat la I) sau TRS (convertit automat la T) în Excel. La import se acceptă doar I sau T în baza de date.</li>
+        </ul>
+    </div>
+
+    <div class="stats">
+        <p class="stats-number" id="mappedCount">0</p>
+        <p class="stats-label">coloane mapate</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" style="padding: 15px; margin-bottom: 20px; border-radius: 6px;
+                background: {% if message.tags == 'success' %}#d4edda{% elif message.tags == 'error' %}#f8d7da{% else %}#d1ecf1{% endif %};
+                color: {% if message.tags == 'success' %}#155724{% elif message.tags == 'error' %}#721c24{% else %}#0c5460{% endif %};
+                border: 1px solid {% if message.tags == 'success' %}#c3e6cb{% elif message.tags == 'error' %}#f5c6cb{% else %}#bee5eb{% endif %};">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" id="mappingForm">
+        {% csrf_token %}
+
+        <table class="mapping-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th style="width: 30%;">Câmp Bază de Date</th>
+                    <th style="width: 25%;">Nume Tehnic</th>
+                    <th style="width: 25%;">Coloană Excel (A, B, C...)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in mapping_data %}
+                <tr>
+                    <td class="field-number">{{ forloop.counter }}</td>
+                    <td class="field-label">{{ item.field_label }}</td>
+                    <td><span class="field-name">{{ item.field_name }}</span></td>
+                    <td>
+                        <input
+                            type="text"
+                            name="excel_{{ item.field_name }}"
+                            value="{{ item.excel_column }}"
+                            placeholder="Ex: A, B, C..."
+                            class="excel-input{% if item.excel_column %} filled{% endif %}"
+                            maxlength="3"
+                            style="text-transform: uppercase;"
+                        >
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="button-group">
+            <button type="submit" class="btn-save">
+                💾 Salvează Maparea
+            </button>
+            <a href="{% url 'admin:manifests_importtemplate_changelist' %}" class="btn-cancel">
+                ❌ Anulează
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('.excel-input');
+    const mappedCount = document.getElementById('mappedCount');
+
+    // Funcție pentru actualizarea counter-ului
+    function updateMappedCount() {
+        let count = 0;
+        inputs.forEach(input => {
+            if (input.value.trim()) {
+                count++;
+                input.classList.add('filled');
+            } else {
+                input.classList.remove('filled');
+            }
+        });
+        mappedCount.textContent = count;
+    }
+
+    // Actualizează counter-ul la început
+    updateMappedCount();
+
+    // Actualizează counter-ul când utilizatorul scrie
+    inputs.forEach(input => {
+        // Validare: doar litere A-Z
+        input.addEventListener('input', function() {
+            // Convertește la majuscule și elimină tot ce nu e literă
+            this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '');
+            updateMappedCount();
+        });
+
+        // Auto-focus la următorul input când apeși Enter
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const allInputs = Array.from(inputs);
+                const currentIndex = allInputs.indexOf(this);
+                if (currentIndex < allInputs.length - 1) {
+                    allInputs[currentIndex + 1].focus();
+                }
+            }
+        });
+    });
+
+    // Validare formular
+    document.getElementById('mappingForm').addEventListener('submit', function(e) {
+        const filledInputs = Array.from(inputs).filter(input => input.value.trim());
+        if (filledInputs.length === 0) {
+            e.preventDefault();
+            alert('⚠️ Trebuie să mapați cel puțin o coloană!');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
