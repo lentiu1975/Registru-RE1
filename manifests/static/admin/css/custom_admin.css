@@ -187,7 +187,7 @@ body.main-sidebar-closed #content {
 /* Coloane tabel - ajustare pentru multe coloane cu redimensionare */
 #result_list th,
 #result_list td {
-    padding: 8px 10px !important;
+    padding: 3px 4px !important;
     font-size: 13px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -196,7 +196,8 @@ body.main-sidebar-closed #content {
 /* Header-uri cu poziție relativă pentru resizer */
 #result_list thead th {
     position: relative !important;
-    padding-right: 20px !important;
+    padding: 3px 1px 3px 1px !important;
+    padding-right: 4px !important;
     min-width: 50px !important;
     border-right: 1px solid #ddd !important;
 }
@@ -286,7 +287,6 @@ img[width="60"] {
 /* Evidențiere containere duplicate */
 .duplicate-container {
     background-color: #fff3cd !important;
-    font-weight: bold !important;
 }
 
 .duplicate-container:hover {
@@ -296,7 +296,6 @@ img[width="60"] {
 /* Evidențiere containere cu observații */
 .has-observations {
     background-color: #f8d7da !important;
-    font-weight: bold !important;
 }
 
 .has-observations:hover {

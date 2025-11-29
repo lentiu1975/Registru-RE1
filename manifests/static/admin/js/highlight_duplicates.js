@@ -98,14 +98,12 @@
             if (hasObservations) {
                 containerCell.classList.add('has-observations');
                 containerCell.style.backgroundColor = '#f8d7da';  // Roșu deschis
-                containerCell.style.fontWeight = 'bold';
                 containerCell.style.borderLeft = 'none';
                 containerCell.setAttribute('title', 'Container cu observații');
                 observationsCount++;
             } else if (valueCounts[value] > 1) {
                 containerCell.classList.add('duplicate-container');
                 containerCell.style.backgroundColor = '#fff3cd';  // Galben deschis
-                containerCell.style.fontWeight = 'bold';
                 containerCell.style.borderLeft = 'none';
                 containerCell.setAttribute('title', 'Container duplicat (apare de ' + valueCounts[value] + ' ori)');
                 highlightedCount++;
