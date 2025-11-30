@@ -1,0 +1,76 @@
+==========================================
+  SETUP BAZA DE DATE - PASII URMATORI
+==========================================
+
+PHP FUNCTIONEAZA! ✓
+Acum trebuie sa configuram baza de date MySQL.
+
+PASUL 1: Creaza Baza de Date in cPanel
+----------------------------------------
+1. Deschide cPanel pe: https://lentiu.ro:2083
+2. Mergi la "MySQL Databases"
+3. La sectiunea "Create New Database":
+   - Database Name: vamactasud
+   - Click "Create Database"
+   - Notează numele complet: lentiuro_vamactasud
+
+PASUL 2: Creaza User pentru Baza de Date
+----------------------------------------
+1. Tot în "MySQL Databases", mergi la "Add New User":
+   - Username: vamauser
+   - Password: [alege o parola sigura]
+   - Click "Create User"
+   - Notează: lentiuro_vamauser
+
+PASUL 3: Adauga User la Database
+---------------------------------
+1. În sectiunea "Add User To Database":
+   - User: lentiuro_vamauser
+   - Database: lentiuro_vamactasud
+   - Click "Add"
+2. În fereastra de privilegii:
+   - Selectează "ALL PRIVILEGES"
+   - Click "Make Changes"
+
+PASUL 4: Importa Schema (database.sql)
+--------------------------------------
+OPTIUNEA A - Via phpMyAdmin (RECOMANDAT):
+1. În cPanel, deschide "phpMyAdmin"
+2. Selectează database-ul "lentiuro_vamactasud" din stânga
+3. Click pe tab-ul "Import"
+4. Click "Choose File" și selectează: database.sql
+5. Click "Go" la final
+6. Verifică că au fost create 8 tabele
+
+OPTIUNEA B - Via FTP (daca A nu merge):
+1. Rulează scriptul: upload_database_sql.ps1
+2. Apoi în phpMyAdmin execută conținutul
+
+PASUL 5: Actualizează Credențialele
+-----------------------------------
+După ce ai creat database-ul, spune-mi:
+- Database name complet (ex: lentiuro_vamactasud)
+- Username complet (ex: lentiuro_vamauser)
+- Password-ul ales
+
+Voi actualiza automat config/database.php cu aceste credențiale.
+
+PASUL 6: Test Final
+-------------------
+După ce actualizăm config/database.php:
+1. Accesează: https://vamactasud.lentiu.ro/login.php
+2. User default: admin
+3. Pass default: admin123
+4. Dacă vezi pagina de admin → SUCCESS!
+
+==========================================
+NOTIȚE IMPORTANTE:
+==========================================
+- Database encoding: utf8mb4 (setată automat)
+- Toate tabelele folosesc utf8mb4_unicode_ci
+- Schema include 8 tabele cu foreign keys
+- User default (admin/admin123) se creează automat
+
+DUPĂ LOGIN:
+- SCHIMBĂ PAROLA ADMINULUI imediat!
+- Folosește pagina de setări din admin panel

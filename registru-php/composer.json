@@ -1,0 +1,19 @@
+{
+    "name": "registru-import/re1",
+    "description": "Registru Import RE1 - Aplicație de gestionare manifeste containere",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "phpoffice/phpspreadsheet": "^1.29"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php -r \"echo 'PhpSpreadsheet instalat cu succes!\\n';\""
+        ]
+    }
+}

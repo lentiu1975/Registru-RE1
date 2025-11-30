@@ -1,0 +1,39 @@
+# Dependencies
+/vendor/
+composer.lock
+
+# Upload directory
+/uploads/*
+!/uploads/.gitkeep
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+error_log
+debug.log
+
+# Temporary files
+*.tmp
+*.temp
+temp_*.txt
+temp_*.ps1
+
+# Images (optional - uncomment dacă nu vrei să incluzi imaginile în Git)
+# /images/containere/**/*
+# /images/drapele/**/*
+# /images/nave/**/*

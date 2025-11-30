@@ -1,0 +1,23 @@
+# Force PHP execution
+AddHandler application/x-httpd-php .php
+AddType application/x-httpd-php .php
+
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+DirectoryIndex index.php index.html
+
+<FilesMatch "\.(sql|log|ini)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+AddDefaultCharset UTF-8
+Options -Indexes
+Options +FollowSymLinks
+
+<FilesMatch "^(composer\.json|composer\.lock|\.gitignore|\.htaccess)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

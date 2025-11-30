@@ -1,0 +1,47 @@
+==========================================
+  SETUP DATABASE - DOAR 3 CLICKURI!
+==========================================
+
+PASUL 1: Creează Database (1 click)
+------------------------------------
+1. Deschide cPanel -> MySQL Databases
+2. La "Create New Database":
+   - Database Name: vamactasud
+   - Click "Create Database"
+   ✓ Va fi creată: lentiuro_vamactasud
+
+PASUL 2: Creează User (1 click)
+--------------------------------
+1. Tot în MySQL Databases, la "Add New User":
+   - Username: vamauser
+   - Password: VamaCtaSud2025!
+   - Click "Create User"
+   ✓ Va fi creat: lentiuro_vamauser
+
+PASUL 3: Adaugă User la Database (1 click)
+-------------------------------------------
+1. La "Add User To Database":
+   - User: lentiuro_vamauser
+   - Database: lentiuro_vamactasud
+   - Click "Add"
+2. În fereastra de privilegii:
+   - Click "ALL PRIVILEGES" (checkbox-ul de sus)
+   - Click "Make Changes"
+
+GATA! Acum spune-mi "gata" și eu:
+----------------------------------
+✓ Actualizez automat config/database.php cu credențialele
+✓ Upload config pe server
+✓ Upload schema SQL pe server
+✓ Îți dau link-ul pentru import în phpMyAdmin
+
+CREDENȚIALE FINALE:
+-------------------
+Database: lentiuro_vamactasud
+User: lentiuro_vamauser
+Pass: VamaCtaSud2025!
+
+LOGIN ADMIN (după import):
+--------------------------
+Username: admin
+Password: admin123

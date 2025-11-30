@@ -1,0 +1,31 @@
+# Enable PHP 8.4
+AddHandler application/x-httpd-ea-php84 .php
+AddType application/x-httpd-ea-php84 .php php84
+
+<IfModule mod_suphp.c>
+    suPHP_ConfigPath /opt/cpanel/ea-php84/root/etc
+</IfModule>
+
+# Force PHP execution
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-ea-php84
+</FilesMatch>
+
+# Default index
+DirectoryIndex index.php index.html
+
+# Security
+<FilesMatch "\.(sql|log|ini)$">
+    Require all denied
+</FilesMatch>
+
+# UTF-8
+AddDefaultCharset UTF-8
+
+# No directory listing
+Options -Indexes +FollowSymLinks
+
+# Protect config files
+<FilesMatch "^(composer\.json|composer\.lock|\.gitignore)$">
+    Require all denied
+</FilesMatch>

@@ -1,0 +1,5 @@
+# Force PHP 8.4 execution
+AddHandler application/x-httpd-ea-php84 .php
+
+# Default document
+DirectoryIndex index.php index.html
